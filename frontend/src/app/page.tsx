@@ -12,7 +12,8 @@ type ApiResponse = {
 };
 
 const API_URL =
-  "https://cohort3-customer-agent-api-215731609750.us-central1.run.app";
+  process.env.NEXT_PUBLIC_API_URL 
+console.log("NEXT_PUBLIC_API_URL =", process.env.NEXT_PUBLIC_API_URL);
 
 const suggestions = [
   "My card payment failed but money was deducted.",

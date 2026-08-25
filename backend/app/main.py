@@ -4,14 +4,12 @@ from pydantic import BaseModel
 from app.agents.customer_agent import agent
 from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI(
-    title="Cohort 3 - Customer-Facing AI Agent",
-    description="Track 1 - Build and Deploy a Customer-Facing AI Agent",
-    version="0.3.0",
-)
+app = FastAPI()
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
+        "https://cohort3-customer-agent-web-215731609750.us-central1.run.app",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
     ],
