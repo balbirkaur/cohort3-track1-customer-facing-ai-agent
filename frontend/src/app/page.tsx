@@ -150,7 +150,6 @@ export default function Home() {
         <aside className="hidden w-72 flex-col border-r border-slate-200 bg-white p-6 lg:flex">
           <div>
 
-            {/* Logo */}
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-600 text-xl font-bold text-white">
                 AI
@@ -167,7 +166,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Capabilities */}
             <div className="mt-8">
               <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-400">
                 Agent capabilities
@@ -203,7 +201,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Security */}
           <div className="mt-auto rounded-xl bg-slate-50 p-4">
             <p className="text-xs font-semibold text-slate-700">
               Security
@@ -246,14 +243,13 @@ export default function Home() {
             </div>
           </header>
 
-          {/* Chat Area */}
+          {/* Chat */}
           <div className="flex flex-1 flex-col">
 
             <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col px-5 py-8 sm:px-8">
 
               {messages.length === 0 ? (
 
-                /* Welcome */
                 <div className="flex flex-1 flex-col items-center justify-center">
 
                   <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-600 text-2xl font-bold text-white shadow-lg">
@@ -270,7 +266,6 @@ export default function Home() {
                     or request human assistance.
                   </p>
 
-                  {/* Suggestions */}
                   <div className="mt-8 grid w-full max-w-2xl gap-3 sm:grid-cols-2">
 
                     {suggestions.map(
@@ -299,7 +294,6 @@ export default function Home() {
 
               ) : (
 
-                /* Messages */
                 <div className="flex-1 space-y-5 overflow-y-auto pb-6">
 
                   {messages.map(
@@ -327,7 +321,6 @@ export default function Home() {
                     )
                   )}
 
-                  {/* Loading */}
                   {loading && (
                     <div className="flex justify-start">
 
@@ -335,6 +328,7 @@ export default function Home() {
 
                         <div className="flex items-center gap-2">
                           <span className="h-2 w-2 animate-pulse rounded-full bg-blue-500" />
+
                           <span>
                             Agent is analyzing your request...
                           </span>
@@ -353,6 +347,7 @@ export default function Home() {
                 onSubmit={sendMessage}
                 className="mt-5"
               >
+
                 <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-2 shadow-lg">
 
                   <input
@@ -373,7 +368,9 @@ export default function Home() {
                     }
                     className="rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
                   >
-                    {loading ? "Thinking..." : "Send"}
+                    {loading
+                      ? "Thinking..."
+                      : "Send"}
                   </button>
 
                 </div>
@@ -383,6 +380,7 @@ export default function Home() {
                   verification. Never share sensitive
                   credentials.
                 </p>
+
               </form>
 
             </div>
@@ -410,6 +408,7 @@ function Capability({
       </div>
 
       <div>
+
         <p className="text-sm font-medium text-slate-700">
           {title}
         </p>
@@ -417,6 +416,7 @@ function Capability({
         <p className="text-xs text-slate-400">
           {text}
         </p>
+
       </div>
 
     </div>
