@@ -172,7 +172,6 @@ export default function Home() {
               </p>
 
               <div className="space-y-2">
-
                 <Capability
                   icon="🔎"
                   title="Knowledge Search"
@@ -196,7 +195,6 @@ export default function Home() {
                   title="Human Escalation"
                   text="Specialist handoff"
                 />
-
               </div>
             </div>
           </div>
@@ -245,7 +243,6 @@ export default function Home() {
 
           {/* Chat */}
           <div className="flex flex-1 flex-col">
-
             <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col px-5 py-8 sm:px-8">
 
               {messages.length === 0 ? (
@@ -306,7 +303,6 @@ export default function Home() {
                             : "justify-start"
                         }`}
                       >
-
                         <div
                           className={`max-w-[85%] whitespace-pre-wrap rounded-2xl px-5 py-4 text-sm leading-6 ${
                             message.role === "user"
@@ -316,26 +312,20 @@ export default function Home() {
                         >
                           {message.content}
                         </div>
-
                       </div>
                     )
                   )}
 
                   {loading && (
                     <div className="flex justify-start">
-
                       <div className="rounded-2xl border border-slate-200 bg-white px-5 py-4 text-sm text-slate-500 shadow-sm">
-
                         <div className="flex items-center gap-2">
                           <span className="h-2 w-2 animate-pulse rounded-full bg-blue-500" />
-
                           <span>
                             Agent is analyzing your request...
                           </span>
                         </div>
-
                       </div>
-
                     </div>
                   )}
 
@@ -347,7 +337,6 @@ export default function Home() {
                 onSubmit={sendMessage}
                 className="mt-5"
               >
-
                 <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-2 shadow-lg">
 
                   <input
@@ -380,7 +369,6 @@ export default function Home() {
                   verification. Never share sensitive
                   credentials.
                 </p>
-
               </form>
 
             </div>
@@ -408,7 +396,6 @@ function Capability({
       </div>
 
       <div>
-
         <p className="text-sm font-medium text-slate-700">
           {title}
         </p>
@@ -416,7 +403,6 @@ function Capability({
         <p className="text-xs text-slate-400">
           {text}
         </p>
-
       </div>
 
     </div>
