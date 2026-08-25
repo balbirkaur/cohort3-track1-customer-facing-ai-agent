@@ -8,13 +8,33 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 load_dotenv()
 
-BASE_DIR = Path(__file__).resolve().parents[3]
+# Support both:
+# 1. Local development
+#    <project-root>/data/knowledge-base/banking_policies.txt
+#
+# 2. Cloud Run
+#    /app/data/knowledge-base/banking_policies.txt
 
-KNOWLEDGE_FILE = (
-    BASE_DIR
+CURRENT_FILE = Path(__file__).resolve()
+
+KNOWLEDGE_FILE_CANDIDATES = [
+    # Cloud Run container
+    Path("/app/data/knowledge-base/banking_policies.txt"),
+
+    # Local project
+    CURRENT_FILE.parents[3]
     / "data"
     / "knowledge-base"
-    / "banking_policies.txt"
+    / "banking_policies.txt",
+]
+
+KNOWLEDGE_FILE = next(
+    (
+        path
+        for path in KNOWLEDGE_FILE_CANDIDATES
+        if path.exists()
+    ),
+    KNOWLEDGE_FILE_CANDIDATES[0],
 )
 
 
@@ -46,13 +66,25 @@ def build_vector_store():
         google_api_key=api_key,
     )
 
-    return FAISS.from_documents(documents, embeddings)
+    return FAISS.from_documents(
+        documents,
+        embeddings,
+    )
 
 
 vector_store = build_vector_store()
 
 
-def search_knowledge_base(query: str, k: int = 3):
-    documents = vector_store.similarity_search(query, k=k)
+def search_knowledge_base(
+    query: str,
+    k: int = 3,
+):
+    documents = vector_store.similarity_search(
+        query,
+        k=k,
+    )
 
-    return [doc.page_content for doc in documents]
+    return [
+        document.page_content
+        for document in documents
+    ]
