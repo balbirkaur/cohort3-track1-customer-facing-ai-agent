@@ -1,15 +1,14 @@
-import os
 from typing import TypedDict
 
-from dotenv import load_dotenv
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.graph import StateGraph, START, END
 
-load_dotenv()
+from app.rag.knowledge_base import search_knowledge_base
 
 
 class AgentState(TypedDict):
     customer_message: str
+    retrieved_context: str
     response: str
 
 
@@ -19,22 +18,45 @@ llm = ChatGoogleGenerativeAI(
 )
 
 
-def customer_agent(state: AgentState):
-    message = state["customer_message"]
+def retrieve_policy(state: AgentState):
+    results = search_knowledge_base(
+        state["customer_message"],
+        k=3,
+    )
 
+    context = "\n\n--- POLICY ---\n\n".join(results)
+
+    return {
+        "retrieved_context": context
+    }
+
+
+def generate_response(state: AgentState):
     prompt = f"""
 You are a professional banking customer support AI agent.
 
-Help the customer clearly and safely.
+Answer the customer's question using ONLY the banking
+policy context provided below.
+
+If the policy does not contain enough information:
+- Do not invent an answer.
+- Clearly say that additional verification is required.
+- Recommend human support when appropriate.
+
+Never request or expose:
+- PIN
+- Password
+- OTP
+- CVV
+- Full card number
 
 Customer message:
-{message}
+{state["customer_message"]}
 
-Rules:
-- Do not invent account or transaction information.
-- Do not claim that a banking action has been completed unless a real tool confirms it.
-- If information is missing, ask a concise clarification question.
-- Be professional, empathetic, and concise.
+Banking policy context:
+{state["retrieved_context"]}
+
+Provide a concise, professional and helpful response.
 """
 
     result = llm.invoke(prompt)
@@ -47,10 +69,12 @@ Rules:
 def build_agent():
     graph = StateGraph(AgentState)
 
-    graph.add_node("customer_agent", customer_agent)
+    graph.add_node("retrieve_policy", retrieve_policy)
+    graph.add_node("generate_response", generate_response)
 
-    graph.add_edge(START, "customer_agent")
-    graph.add_edge("customer_agent", END)
+    graph.add_edge(START, "retrieve_policy")
+    graph.add_edge("retrieve_policy", "generate_response")
+    graph.add_edge("generate_response", END)
 
     return graph.compile()
 

@@ -1,0 +1,45 @@
+BANKING CUSTOMER SUPPORT POLICIES
+
+CARD PAYMENT FAILED
+
+If a card payment fails but the customer sees a pending amount:
+- The amount may be a temporary authorization hold.
+- The hold may automatically disappear after the merchant or bank completes processing.
+- The customer should not assume that a permanent debit has occurred until the transaction status is confirmed.
+
+If the transaction is confirmed as completed but the customer did not receive the expected service or product:
+- The customer may need to contact the merchant first.
+- A dispute may be initiated according to the bank's dispute policy.
+
+CARD PAYMENT REVERSED
+
+A reversed card payment means the transaction was initially authorized but subsequently reversed.
+The customer should wait for the reversal to reflect in the account.
+If the reversal does not appear within the expected processing period, the customer should contact customer support.
+
+UNKNOWN TRANSACTION
+
+If a customer reports an unknown transaction:
+- Do not assume that the transaction is fraudulent.
+- Verify the transaction details.
+- Ask the customer to confirm whether they recognize the merchant.
+- If fraud is suspected, escalate the case according to the bank's fraud procedure.
+
+ACCOUNT SECURITY
+
+Never ask customers to provide:
+- Full password
+- PIN
+- One-time password (OTP)
+- Full card number
+- CVV
+
+The AI agent must never request or expose these sensitive credentials.
+
+HUMAN ESCALATION
+
+Escalate to a human support representative when:
+- The customer's issue requires a banking action that the available tools cannot perform.
+- The customer reports suspected fraud.
+- The agent has insufficient information to provide a reliable answer.
+- The customer explicitly requests human assistance.
