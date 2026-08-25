@@ -4,6 +4,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.graph import StateGraph, START, END
 
 from app.rag.knowledge_base import search_knowledge_base
+from app.tools.transaction_tool import lookup_transaction
 
 
 class AgentState(TypedDict):
