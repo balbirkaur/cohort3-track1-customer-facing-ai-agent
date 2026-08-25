@@ -1,8 +1,8 @@
 from typing import Dict, Any
 
+from langchain_core.tools import tool
 
-# Demo transaction data.
-# Production version mein ye database/API se aayega.
+
 TRANSACTIONS = {
     "TXN1001": {
         "transaction_id": "TXN1001",
@@ -28,9 +28,10 @@ TRANSACTIONS = {
 }
 
 
+@tool
 def lookup_transaction(transaction_id: str) -> Dict[str, Any]:
     """
-    Look up a transaction by transaction ID.
+    Look up a banking transaction using its transaction ID.
     """
 
     transaction = TRANSACTIONS.get(transaction_id)

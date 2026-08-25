@@ -6,8 +6,8 @@ from app.agents.customer_agent import agent
 
 app = FastAPI(
     title="Cohort 3 - Customer-Facing AI Agent",
-    description="Track 1 - Customer-Facing AI Agent",
-    version="0.2.0",
+    description="Track 1 - Build and Deploy a Customer-Facing AI Agent",
+    version="0.3.0",
 )
 
 
@@ -30,13 +30,16 @@ def health():
 
 @app.post("/chat")
 def chat(request: ChatRequest):
-    result = agent.invoke({
-        "customer_message": request.message,
-        "retrieved_context": "",
-        "response": "",
-    })
+    result = agent.invoke(
+        {
+            "messages": [
+                ("user", request.message)
+            ]
+        }
+    )
+
+    final_message = result["messages"][-1]
 
     return {
-        "response": result["response"],
-        "sources": "banking_policies.txt",
+        "response": final_message.content
     }

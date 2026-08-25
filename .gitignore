@@ -1,0 +1,43 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Node / frontend
+node_modules/
+.next/
+out/
+dist/
+build/
+.env
+.env.*
+
+# Python / backend
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+*.log
+
+# Data / local runtime
+data/*.csv
+data/*.json
+!data/README.md
+
+# Docker / packaging
+*.tar
+*.tgz
+
+# Misc
+coverage/
+.mypy_cache/
+.ruff_cache/
+
+.venv/
+.env
+__pycache__/
+*.pyc

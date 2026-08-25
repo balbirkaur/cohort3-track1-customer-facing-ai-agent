@@ -1,16 +1,30 @@
-from typing import TypedDict
+from typing import Annotated, TypedDict
 
+from dotenv import load_dotenv
+from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.tools import tool
 from langgraph.graph import StateGraph, START, END
+from langgraph.graph.message import add_messages
+from langgraph.prebuilt import ToolNode
 
-from app.rag.knowledge_base import search_knowledge_base
 from app.tools.transaction_tool import lookup_transaction
+from app.tools.support_ticket_tool import create_support_ticket
+from app.tools.escalation_tool import escalate_to_human
+from app.rag.knowledge_base import search_knowledge_base
+
+load_dotenv()
 
 
 class AgentState(TypedDict):
-    customer_message: str
-    retrieved_context: str
-    response: str
+    messages: Annotated[list[BaseMessage], add_messages]
+
+
+tools = [
+    lookup_transaction,
+    create_support_ticket,
+    escalate_to_human,
+]
 
 
 llm = ChatGoogleGenerativeAI(
@@ -18,66 +32,104 @@ llm = ChatGoogleGenerativeAI(
     temperature=0.2,
 )
 
+llm_with_tools = llm.bind_tools(tools)
 
-def retrieve_policy(state: AgentState):
-    results = search_knowledge_base(
-        state["customer_message"],
+
+SYSTEM_PROMPT = """
+You are a professional banking customer support AI agent.
+
+Your job is to help customers safely and accurately.
+
+Available tools:
+
+1. lookup_transaction
+   Use when the customer provides a transaction ID or asks
+   about a specific transaction.
+
+2. create_support_ticket
+   Use when the customer has an unresolved issue that needs
+   support follow-up.
+
+3. escalate_to_human
+   Use for suspected fraud, high-risk issues, or when the
+   customer explicitly asks for a human representative.
+
+Security rules:
+- NEVER ask for PIN.
+- NEVER ask for OTP.
+- NEVER ask for password.
+- NEVER ask for CVV.
+- NEVER ask for the full card number.
+- NEVER invent transaction information.
+- NEVER claim an action was completed unless a tool confirms it.
+
+For general banking policy questions, use the supplied
+knowledge-base context.
+
+If the knowledge base does not contain enough information,
+say that additional verification is required.
+"""
+
+
+def call_model(state: AgentState):
+    user_message = state["messages"][-1].content
+
+    context = search_knowledge_base(
+        user_message,
         k=3,
     )
 
-    context = "\n\n--- POLICY ---\n\n".join(results)
+    context_text = "\n\n--- POLICY ---\n\n".join(context)
+
+    messages = [
+        SystemMessage(
+            content=SYSTEM_PROMPT
+            + "\n\nBANKING KNOWLEDGE BASE:\n"
+            + context_text
+        )
+    ]
+
+    messages.extend(state["messages"])
+
+    response = llm_with_tools.invoke(messages)
 
     return {
-        "retrieved_context": context
+        "messages": [response]
     }
 
 
-def generate_response(state: AgentState):
-    prompt = f"""
-You are a professional banking customer support AI agent.
+def should_continue(state: AgentState):
+    last_message = state["messages"][-1]
 
-Answer the customer's question using ONLY the banking
-policy context provided below.
+    if getattr(last_message, "tool_calls", None):
+        return "tools"
 
-If the policy does not contain enough information:
-- Do not invent an answer.
-- Clearly say that additional verification is required.
-- Recommend human support when appropriate.
+    return END
 
-Never request or expose:
-- PIN
-- Password
-- OTP
-- CVV
-- Full card number
 
-Customer message:
-{state["customer_message"]}
-
-Banking policy context:
-{state["retrieved_context"]}
-
-Provide a concise, professional and helpful response.
-"""
-
-    result = llm.invoke(prompt)
-
-    return {
-        "response": result.content
-    }
+tool_node = ToolNode(tools)
 
 
 def build_agent():
-    graph = StateGraph(AgentState)
+    workflow = StateGraph(AgentState)
 
-    graph.add_node("retrieve_policy", retrieve_policy)
-    graph.add_node("generate_response", generate_response)
+    workflow.add_node("agent", call_model)
+    workflow.add_node("tools", tool_node)
 
-    graph.add_edge(START, "retrieve_policy")
-    graph.add_edge("retrieve_policy", "generate_response")
-    graph.add_edge("generate_response", END)
+    workflow.add_edge(START, "agent")
 
-    return graph.compile()
+    workflow.add_conditional_edges(
+        "agent",
+        should_continue,
+        {
+            "tools": "tools",
+            END: END,
+        },
+    )
+
+    workflow.add_edge("tools", "agent")
+
+    return workflow.compile()
 
 
 agent = build_agent()
