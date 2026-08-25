@@ -1,9 +1,7 @@
 from typing import Annotated, TypedDict
 
-from dotenv import load_dotenv
-from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_core.tools import tool
+from langchain_core.messages import BaseMessage, SystemMessage
+from langchain_google_vertexai import ChatVertexAI
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import add_messages
 from langgraph.prebuilt import ToolNode
@@ -12,8 +10,6 @@ from app.tools.transaction_tool import lookup_transaction
 from app.tools.support_ticket_tool import create_support_ticket
 from app.tools.escalation_tool import escalate_to_human
 from app.rag.knowledge_base import search_knowledge_base
-
-load_dotenv()
 
 
 class AgentState(TypedDict):
@@ -27,9 +23,11 @@ tools = [
 ]
 
 
-llm = ChatGoogleGenerativeAI(
+llm = ChatVertexAI(
     model="gemini-2.5-flash",
     temperature=0.2,
+    project="cohort3-apac-505212",
+    location="us-central1",
 )
 
 llm_with_tools = llm.bind_tools(tools)

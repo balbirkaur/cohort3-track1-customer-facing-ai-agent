@@ -12,3 +12,5 @@ faiss-cpu
 python-dotenv
 pydantic
 pydantic-settings
+
+langchain-google-vertexai
